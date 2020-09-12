@@ -51,8 +51,9 @@ def loadRules():
     loadedGroups = eval(contents[1])
     for i in loadedGroups:
         groups[i] = loadedGroups[i]
-    dispFeatures.delete("1.0", END)
-    dispFeatures.insert("1.0", formatChars())
+    dispGroups.delete("1.0", END)
+    dispGroups.insert("1.0", formatGroups())
+    viewRules()
 
 def formatDict(toFormat):
     toReturn = ''
@@ -201,10 +202,10 @@ def textToFeatures(text):
             textInput.title('New character found')
             textInput.geometry("150x300")
             heading = Label(textInput, text="New character found\nPlease list features for\n"+i)
-            heading.place(relx=1, width=150, x=0, y=20, anchor=NE)
+            heading.pack(fill='both', side='top')#lace(relx=1, width=150, x=0, y=20, anchor=NE)
 
-            newFeats = Text(textInput)
-            newFeats.place(relx=1, width=125, height=200, x=-12.5, y=50, anchor=NE)
+            newFeats = Text(textInput, height=10)
+            newFeats.pack(fill='both', side='top')#lace(relx=1, width=125, height=200, x=-12.5, y=50, anchor=NE)
 
             def addFeatsFromPopup(i):
                 characters[i] = []
@@ -215,8 +216,8 @@ def textToFeatures(text):
                 features.append(characters[i])
                 waitVar.set(1)
                 
-            addNewFeats = Button(textInput, text="Add features for\n"+i, command=lambda: addFeatsFromPopup(i))
-            addNewFeats.place(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
+            addNewFeats = Button(textInput, text="Add features for\n"+i, command=lambda: addFeatsFromPopup(i), height=2)
+            addNewFeats.pack(fill='both', side='top')#lace(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
             
             textInput.focus_force()
             root.wait_variable(waitVar)
