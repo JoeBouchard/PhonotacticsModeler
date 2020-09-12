@@ -195,7 +195,9 @@ def textToFeatures(text):
     features = []
     for i in text:
         if i in characters.keys():
-            features.append(characters[i])
+            features.append([])
+            for j in characters[i]:
+                features[-1].append(j)
         elif i.isalnum():
             waitVar = IntVar()
             textInput=Tk()
@@ -213,7 +215,7 @@ def textToFeatures(text):
                 for j in newAttrs.split("\n"):
                     if j.isalpha():
                         characters[i].append(j)
-                features.append(characters[i])
+                features.append(characters.copy()[i])
                 waitVar.set(1)
                 
             addNewFeats = Button(textInput, text="Add features for\n"+i, command=lambda: addFeatsFromPopup(i), height=2)
@@ -230,7 +232,8 @@ def featuresToText(features):
     textList = []
     for i in features:
         found = False
-        for char in characters.keys():
+        for char in characters.copy().keys():
+            print(char, ', '.join(characters[char]))
             found = True
             for j in i:
                 if j not in characters[char]:
@@ -238,6 +241,7 @@ def featuresToText(features):
                     break
             if found:
                 for j in characters[char]:
+                    print(j, char, j in characters[char])
                     if j not in i:
                         found = False
             if found:
@@ -249,10 +253,10 @@ def featuresToText(features):
             textInput.title('New feature set found')
             textInput.geometry("150x300")
             heading = Label(textInput, text="New feature set found\nPlease input the character for\n"+'\n'.join(i))
-            heading.place(relx=1, width=150, height=160, x=0, y=20, anchor=NE)
+            heading.pack(fill='both', side='top')#lace(relx=1, width=150, height=160, x=0, y=20, anchor=NE)
 
-            newFeats = Text(textInput)
-            newFeats.place(relx=1, width=25, height=25, x=-100, y=180, anchor=NE)
+            newFeats = Text(textInput, height=1)
+            newFeats.pack(fill='both', side='top')#lace(relx=1, width=25, height=25, x=-100, y=180, anchor=NE)
 
             def addCharFromPopup(i):
                 newAttrs = newFeats.get("1.0", END)
@@ -262,7 +266,7 @@ def featuresToText(features):
                 waitVar.set(1)
                 
             addNewFeats = Button(textInput, text="Add new character", command=lambda: addCharFromPopup(i))
-            addNewFeats.place(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
+            addNewFeats.pack(fill='both', side='top')#lace(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
             
             textInput.focus_force()
             root.wait_variable(waitVar)
@@ -437,8 +441,53 @@ def viewRules():
         word = startingWord.get("1.0", END)
         wordFeats = textToFeatures(word)
 
+        for r in rules:
+            for i in range(0, len(wordFeats)):
+                print(i, characters['o'])
+                for f in r[0]:
+                    valid = True
+                    if f not in wordFeats[i]:
+                        valid = False
+                        break
+                if valid:
+                    j=i
+                    if 'p' in r[1]:
+                        j+=1
+                    else:
+                        j-=1
+                    for f in r[2]:
+                        if f not in wordFeats[j]:
+                            valid = False
+                            break
+                if valid:
+                    if r[3] == 'assimilate':
+                        featToAssim = []
+                        for g in r[4]:
+                            if g in list(groups.keys()):
+                                featToAssim.append(groups[g])
+                            else:
+                                messagebox.showwarning(title="Not a group",
+                                                       message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
+                                groups[g] = [g]
+                                featsToAssim.append([g])
+                        for grup in featToAssim:
+                            for feat in grup:
+                                while feat in wordFeats[i]:
+                                    wordFeats[i].remove(feat)
+                                if feat in wordFeats[j]:
+                                    print(feat, characters['o'])
+                                    wordFeats[i].append(feat)
+                                    print(feat, characters['o'])
+                    #elif r[3] == 'propagate':
+                        
+        print(wordFeats)
+
         endingWord.delete("1.0", END)
         endingWord.insert("1.0", featuresToText(wordFeats))
+        dispGroups.delete("1.0", END)
+        dispGroups.insert("1.0", formatGroups())
+        dispFeatures.delete("1.0", END)
+        dispFeatures.insert("1.0", formatChars())
         
 
     startingWord = Text(ruleScreen, height=1)
@@ -474,7 +523,7 @@ def formatRule(ruleArray):
 
     print(ruleStr)
     makeNewline = False
-    toReturn = ''
+    toReturn = 'i'
     lastSpace=0
     for i in range(0, len(ruleStr)):
         if i%20 == 19:
