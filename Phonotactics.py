@@ -454,10 +454,13 @@ def viewRules():
                         j+=1
                     else:
                         j-=1
-                    for f in r[2]:
-                        if f not in wordFeats[j]:
-                            valid = False
-                            break
+                    if j < len(wordFeats)and j > 0:
+                        for f in r[2]:
+                            if f not in wordFeats[j]:
+                                valid = False
+                                break
+                    else:
+                        valid=False
                 if valid:
                     if r[3] == 'assimilate':
                         featToAssim = []
