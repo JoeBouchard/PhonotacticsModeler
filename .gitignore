@@ -6,3 +6,4 @@ build
 *.ico
 *.spec
 dist
+pyinstaller
