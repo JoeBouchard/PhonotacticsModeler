@@ -2,3 +2,7 @@ Phonotactics.build
 rule and character files
 compile.bat
 __pycache__
+build
+*.ico
+*.spec
+dist
