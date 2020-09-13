@@ -279,7 +279,7 @@ def addRuleWindow():
     global ruleScreen
     ruleScreen = Tk()
     ruleScreen.title("Add rule")
-    ruleScreen.geometry("600x150")
+    ruleScreen.geometry("750x150")
     
     ruleLbl = Label(ruleScreen, text="if")
     ruleLbl.pack(fill='both', side='left')
@@ -288,7 +288,7 @@ def addRuleWindow():
     changeStart.pack(fill='x', side='left')#lace(height=100, width=75, relx = 1, x = -570, y=20, anchor=NW)
 
     beforeAfterVar = StringVar(ruleScreen)
-    beforeAfter = OptionMenu(ruleScreen, beforeAfterVar, "precedes", "follows")
+    beforeAfter = OptionMenu(ruleScreen, beforeAfterVar, "precedes", "follows", "is")
     beforeAfter.pack(fill='x', side='left')#lace(height=25, width=85, relx=1, x=-490, y=20)
 
     triggerAttr = Text(ruleScreen, height=10, width=10)
@@ -300,20 +300,56 @@ def addRuleWindow():
     toAssimilate = Text(ruleScreen, height=10, width=10)
     propVar = StringVar(ruleScreen)
     propDistance = OptionMenu(ruleScreen, propVar, "to next consonant", "to next vowel", "to next sound", "to all consonants", "to all vowels", "to all sounds")
+    delSelect = OptionMenu(ruleScreen, propVar, "previous character", "this character", "following character")
+
+    lblAdd = Label(ruleScreen, text="Add")
+    lblSubtract = Label(ruleScreen, text="and subtract")
+    toSubtract=Text(ruleScreen, height=10, width=10)
 
     def update(value):
         if value == "assimilate":
-            toAssimilate.pack(fill='both', side='left')#lace(height=100, width=75, relx = 1, x = -215, y=20, anchor=NW)
+            toAssimilate.pack(fill='both', side='left')
             propDistance.pack_forget()
-            propDistance.update()
-            ruleScreen.update()
+            delSelect.pack_forget()
+            lblAdd.pack_forget()
+            lblSubtract.pack_forget()
+            toSubtract.pack_forget()
 
         elif value == "propagate":
-            toAssimilate.pack(fill='both', side='left')#lace(height=100, width=75, relx = 1, x = -215, y=20, anchor=NW)
-            propDistance.pack(fill='both', side='left')#lace(height=25, width=125, relx = 1, x = -140, y=20, anchor=NW)
+            toAssimilate.pack(fill='both', side='left')
+            propDistance.pack(fill='both', side='left')
+            delSelect.pack_forget()
+            lblAdd.pack_forget()
+            lblSubtract.pack_forget()
+            toSubtract.pack_forget()
+            
+        elif value == "delete":
+            toAssimilate.pack_forget()
+            propDistance.pack_forget()
+            lblAdd.pack_forget()
+            lblSubtract.pack_forget()
+            toSubtract.pack_forget()
+            delSelect.pack(fill='both', side='left')
 
+        elif value == "insert":
+            toAssimilate.pack(fill='both', side='left')
+            lblAdd.pack_forget()
+            lblSubtract.pack_forget()
+            toSubtract.pack_forget()
+            delSelect.pack_forget()
+            propDistance.pack_forget()
+
+        elif value == "add/subtract feature":
+            propDistance.pack_forget()
+            toAssimilate.pack_forget()
+            lblAdd.pack(fill='both', side='left')
+            toAssimilate.pack(fill='both', side='left')
+            lblSubtract.pack(fill='both', side='left')
+            toSubtract.pack(fill='both', side='left')
+            
+            
     actionVar = StringVar(ruleScreen)
-    actionChoice=OptionMenu(ruleScreen, actionVar, "assimilate", "propagate", "delete", "insert", command=update)
+    actionChoice=OptionMenu(ruleScreen, actionVar, "assimilate", "propagate", "delete", "insert", "add/subtract feature", command=update)
     actionChoice.pack(fill='both', side='left')#lace(height=25, width=85, relx=1, x=-305, y=20)
     ruleScreen.focus_force()
 
