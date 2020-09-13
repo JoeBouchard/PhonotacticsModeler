@@ -14,8 +14,9 @@ root.title("Phonological Rule Processor")
 root.geometry("600x600")
 
 def saveChars():
-    toSave = filedialog.asksaveasfile(filetypes=[("Character files", "*.chr")], defaultextension=[("Character files", "*.chr")])
+    fName = filedialog.asksaveasfilename(filetypes=[("Character files", "*.chr")], defaultextension=[("Character files", "*.chr")])
     root.update()
+    toSave = open(fName, mode='w', encoding='utf-8')
     toSave.write(str(characters))
     toSave.close()
 
@@ -23,13 +24,13 @@ def saveRules():
     print(rules)
     toSave = filedialog.asksaveasfile(filetypes=[("Rule files", "*.rlz")], defaultextension=[("Character files", "*.chr")])
     root.update()
-    toSave.write(str(rules)+'RULEGROUPSPLIT'+str(groups))
+    toSave.write(str(rules)+'RULEGROUPSPLIT'+str(groups), 'utf-8')
     toSave.close()
 
 def loadChars():
     toLoad = filedialog.askopenfilename(filetypes=[("Character files", "*.chr")])
     root.update()
-    file = open(toLoad, 'r')
+    file = open(toLoad, 'r', encoding='utf-8')
     toReturn = eval(file.read())
     file.close()
     print(toReturn)
@@ -233,7 +234,6 @@ def featuresToText(features):
     for i in features:
         found = False
         for char in characters.copy().keys():
-            print(char, ', '.join(characters[char]))
             found = True
             for j in i:
                 if j not in characters[char]:
@@ -241,7 +241,6 @@ def featuresToText(features):
                     break
             if found:
                 for j in characters[char]:
-                    print(j, char, j in characters[char])
                     if j not in i:
                         found = False
             if found:
@@ -475,9 +474,7 @@ def viewRules():
                                 while feat in wordFeats[i]:
                                     wordFeats[i].remove(feat)
                                 if feat in wordFeats[j]:
-                                    print(feat, characters['o'])
                                     wordFeats[i].append(feat)
-                                    print(feat, characters['o'])
                     #elif r[3] == 'propagate':
                         
         print(wordFeats)
