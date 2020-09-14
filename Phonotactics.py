@@ -11,7 +11,7 @@ groups = {}
 
 root = Tk()
 root.title("Phonological Rule Processor")
-root.geometry("600x600")
+root.geometry("1050x720")
 
 def saveChars():
     fName = filedialog.asksaveasfilename(filetypes=[("Character files", "*.chr")], defaultextension=[("Character files", "*.chr")])
@@ -58,9 +58,9 @@ def loadRules():
     file.close()
     for i in loadedRules:
         rules.append(i)
+    updateRuleBox()
     dispGroups.delete("1.0", END)
     dispGroups.insert("1.0", formatGroups())
-    viewRules()
 
 def loadGroups():
     toLoad = filedialog.askopenfilename(filetypes=[("Groups files", "*.grpz")])
@@ -222,10 +222,10 @@ def textToFeatures(text):
             textInput.title('New character found')
             textInput.geometry("150x300")
             heading = Label(textInput, text="New character found\nPlease list features for\n"+i)
-            heading.pack(fill='both', side='top')#lace(relx=1, width=150, x=0, y=20, anchor=NE)
+            heading.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx=1, width=150, x=0, y=20, anchor=NE)
 
             newFeats = Text(textInput, height=10)
-            newFeats.pack(fill='both', side='top')#lace(relx=1, width=125, height=200, x=-12.5, y=50, anchor=NE)
+            newFeats.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx=1, width=125, height=200, x=-12.5, y=50, anchor=NE)
 
             def addFeatsFromPopup(i):
                 characters[i] = []
@@ -237,7 +237,7 @@ def textToFeatures(text):
                 waitVar.set(1)
                 
             addNewFeats = Button(textInput, text="Add features for\n"+i, command=lambda: addFeatsFromPopup(i), height=2)
-            addNewFeats.pack(fill='both', side='top')#lace(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
+            addNewFeats.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
             
             textInput.focus_force()
             root.wait_variable(waitVar)
@@ -269,10 +269,10 @@ def featuresToText(features):
             textInput.title('New feature set found')
             textInput.geometry("150x300")
             heading = Label(textInput, text="New feature set found\nPlease input the character for\n"+'\n'.join(i))
-            heading.pack(fill='both', side='top')#lace(relx=1, width=150, height=160, x=0, y=20, anchor=NE)
+            heading.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx=1, width=150, height=160, x=0, y=20, anchor=NE)
 
             newFeats = Text(textInput, height=1)
-            newFeats.pack(fill='both', side='top')#lace(relx=1, width=25, height=25, x=-100, y=180, anchor=NE)
+            newFeats.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx=1, width=25, height=25, x=-100, y=180, anchor=NE)
 
             def addCharFromPopup(i):
                 newAttrs = newFeats.get("1.0", END)
@@ -282,7 +282,7 @@ def featuresToText(features):
                 waitVar.set(1)
                 
             addNewFeats = Button(textInput, text="Add new character", command=lambda: addCharFromPopup(i))
-            addNewFeats.pack(fill='both', side='top')#lace(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
+            addNewFeats.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx=1, width=125, height=50, x=-12.5, y=260, anchor=NE)
             
             textInput.focus_force()
             root.wait_variable(waitVar)
@@ -291,343 +291,243 @@ def featuresToText(features):
             dispFeatures.insert("1.0", formatChars())
 
     return ''.join(textList)
-            
-def addRuleWindow():
-    global ruleScreen
-    ruleScreen = Tk()
-    ruleScreen.title("Add rule")
-    ruleScreen.geometry("750x150")
+
+def updateRuleInput(value):
+    if value == "assimilate":
+        toAssimilate.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+        propDistance.pack_forget()
+        delSelect.pack_forget()
+        lblAdd.pack_forget()
+        lblSubtract.pack_forget()
+        toSubtract.pack_forget()
+
+    elif value == "propagate":
+        toAssimilate.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+        propDistance.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+        delSelect.pack_forget()
+        lblAdd.pack_forget()
+        lblSubtract.pack_forget()
+        toSubtract.pack_forget()
+        
+    elif value == "delete":
+        toAssimilate.pack_forget()
+        propDistance.pack_forget()
+        lblAdd.pack_forget()
+        lblSubtract.pack_forget()
+        toSubtract.pack_forget()
+        delSelect.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+
+    elif value == "insert":
+        toAssimilate.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+        lblAdd.pack_forget()
+        lblSubtract.pack_forget()
+        toSubtract.pack_forget()
+        delSelect.pack_forget()
+        propDistance.pack_forget()
+
+    elif value == "add/subtract feature":
+        propDistance.pack_forget()
+        toAssimilate.pack_forget()
+        lblAdd.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
+        toAssimilate.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+        lblSubtract.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
+        toSubtract.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
+
+def addRule():
+    newRule = []
+    val1 = []
+    val3 = []
     
-    ruleLbl = Label(ruleScreen, text="if")
-    ruleLbl.pack(fill='both', side='left')
+    for i in changeStart.get("1.0", END).split('\n'):
+        if i != '':
+            val1.append(i)
+            
+    val2 = beforeAfterVar.get()
+    for i in triggerAttr.get("1.0", END).split("\n"):
+        if i != '':
+            val3.append(i)
+            
+    val4 = actionVar.get()
+    val5 = None
+    val6 = None
+    if val4 != '':
+        print(val4)
+        if val4 == 'assimilate' or val4 == 'insert':
+            val5 = []
+            for i in toAssimilate.get("1.0", END).split('\n'):
+                if i != '':
+                    val5.append(i)
+            print(len(val5))
+            if len(val5) == 1 and val4 == 'insert':
+                print(val5)
+                val5 = textToFeatures(val5[0])[0]
+                print(val5[0])
+            
+        elif val4 == 'propagate' or val4 == 'delete':
+            val5 = []
+            for i in toAssimilate.get("1.0", END).split('\n'):
+                if i != '':
+                    val5.append(i)
+            val6 = propVar.get()
 
-    changeStart = Text(ruleScreen, height=10, width=10)
-    changeStart.pack(fill='x', side='left')
+        elif val4 == 'add/subtract feature':
+            val5 = []
+            for i in toAssimilate.get("1.0", END).split('\n'):
+                if i != '':
+                    val5.append(i)
+            val6 = []
+            for i in toSubtract.get("1.0", END).split('\n'):
+                if i != '':
+                    val6.append(i)
+        
+        newRule = [val1, val2, val3, val4, val5, val6]
+        rules.append(newRule)
+        messagebox.showinfo("Success!", "Added new rule:\n"+str(rules[-1]))
+    else:
+        messagebox.showerror("Error", "Invalid rule. \nBlank combobox")
+    updateRuleBox()
     
-    beforeAfterVar = StringVar(ruleScreen)
-    beforeAfter = OptionMenu(ruleScreen, beforeAfterVar, "precedes", "follows", "is")
-    beforeAfter.pack(fill='x', side='left')
+def addGroup():
+    gName = groupName.get("1.0", END).split('\n')[0]
+    if gName in groups.keys():
+        ans=messagebox.askokcancel(title="Already exists", message="A group already exists with this name.\nDo you want to overwrite it?")
+        if not ans:
+            return -1
+    else:
+        groups[gName] = []
+        
+    gMemsText = groupFeatures.get("1.0", END)
+    for i in gMemsText.split('\n'):
+        if i.isalnum():
+            groups[gName].append(i)
+
+    dispGroups.delete("1.0", END)
+    dispGroups.insert("1.0", formatGroups())
     
-    triggerAttr = Text(ruleScreen, height=10, width=10)
-    triggerAttr.pack(fill='x', side='left')
-    
-    lblPlus = Label(ruleScreen, text=":")
-    lblPlus.pack(fill='x', side='left')
-    
-    toAssimilate = Text(ruleScreen, height=10, width=10)
-    propVar = StringVar(ruleScreen)
-    propDistance = OptionMenu(ruleScreen, propVar, "to next consonant", "to next vowel", "to next sound", "to all consonants", "to all vowels", "to all sounds")
-    delSelect = OptionMenu(ruleScreen, propVar, "previous character", "this character", "following character")
+def loadGroup():
+    gName = groupName.get("1.0", END).split('\n')[0]
+    if gName in groups.keys():
+        groupFeatures.delete("1.0", END)
+        groupFeatures.insert("1.0", '\n'.join(groups[gName]))
+    else:
+        messagebox.showerror(title="Error", message="Group not found")
 
-    lblAdd = Label(ruleScreen, text="Add")
-    lblSubtract = Label(ruleScreen, text="and subtract")
-    toSubtract=Text(ruleScreen, height=10, width=10)
-
-    def update(value):
-        if value == "assimilate":
-            toAssimilate.pack(fill='both', side='left')
-            propDistance.pack_forget()
-            delSelect.pack_forget()
-            lblAdd.pack_forget()
-            lblSubtract.pack_forget()
-            toSubtract.pack_forget()
-
-        elif value == "propagate":
-            toAssimilate.pack(fill='both', side='left')
-            propDistance.pack(fill='both', side='left')
-            delSelect.pack_forget()
-            lblAdd.pack_forget()
-            lblSubtract.pack_forget()
-            toSubtract.pack_forget()
-            
-        elif value == "delete":
-            toAssimilate.pack_forget()
-            propDistance.pack_forget()
-            lblAdd.pack_forget()
-            lblSubtract.pack_forget()
-            toSubtract.pack_forget()
-            delSelect.pack(fill='both', side='left')
-
-        elif value == "insert":
-            toAssimilate.pack(fill='both', side='left')
-            lblAdd.pack_forget()
-            lblSubtract.pack_forget()
-            toSubtract.pack_forget()
-            delSelect.pack_forget()
-            propDistance.pack_forget()
-
-        elif value == "add/subtract feature":
-            propDistance.pack_forget()
-            toAssimilate.pack_forget()
-            lblAdd.pack(fill='both', side='left')
-            toAssimilate.pack(fill='both', side='left')
-            lblSubtract.pack(fill='both', side='left')
-            toSubtract.pack(fill='both', side='left')
-            
-            
-    actionVar = StringVar(ruleScreen)
-    actionChoice=OptionMenu(ruleScreen, actionVar, "assimilate", "propagate", "delete", "insert", "add/subtract feature", command=update)
-    actionChoice.pack(fill='both', side='left')
-    ruleScreen.focus_force()
-
-    def addRule():
-        newRule = []
-        
-        val1 = []
-        val3 = []
-        
-        for i in changeStart.get("1.0", END).split('\n'):
-            if i != '':
-                val1.append(i)
-                
-        val2 = beforeAfterVar.get()
-        
-        for i in triggerAttr.get("1.0", END).split("\n"):
-            if i != '':
-                val3.append(i)
-                
-        val4 = actionVar.get()
-
-        val5 = None
-        val6 = None
-
-        if val4 != '':
-            print(val4)
-            if val4 == 'assimilate' or val4 == 'insert':
-                val5 = []
-                for i in toAssimilate.get("1.0", END).split('\n'):
-                    if i != '':
-                        val5.append(i)
-                print(len(val5))
-                if len(val5) == 1 and val4 == 'insert':
-                    print(val5)
-                    val5 = textToFeatures(val5[0])[0]
-                    print(val5[0])
-                
-            elif val4 == 'propagate' or val4 == 'delete':
-                val5 = []
-                for i in toAssimilate.get("1.0", END).split('\n'):
-                    if i != '':
-                        val5.append(i)
-                val6 = propVar.get()
-
-            elif val4 == 'add/subtract feature':
-                val5 = []
-                for i in toAssimilate.get("1.0", END).split('\n'):
-                    if i != '':
-                        val5.append(i)
-                val6 = []
-                for i in toSubtract.get("1.0", END).split('\n'):
-                    if i != '':
-                        val6.append(i)
-            
-            newRule = [val1, val2, val3, val4, val5, val6]
-            rules.append(newRule)
-            messagebox.showinfo("Success!", "Added new rule:\n"+str(rules[-1]))
-            viewRules()
-        else:
-            messagebox.showerror("Error", "Invalid rule. \nBlank combobox")
-        
-        
-        
-    ruleButton = Button(ruleScreen, text="Add Rule", command=addRule)
-    ruleButton.pack(fill='both', side='right')#lace(height=50, width=50, relx=1, x=-305, y=50)
-
-def addGroupWindow():
-    groupScreen = Tk()
-    groupScreen.title("Make new group")
-    groupScreen.geometry("150x600")
-
-    def addGroup():
-        gName = groupName.get("1.0", END).split('\n')[0]
-        if gName in groups.keys():
-            ans=messagebox.askokcancel(title="Already exists", message="A group already exists with this name.\nDo you want to overwrite it?")
-            if not ans:
-                return -1
-        else:
-            groups[gName] = []
-            
-        gMemsText = groupFeatures.get("1.0", END)
-        for i in gMemsText.split('\n'):
-            if i.isalnum():
-                groups[gName].append(i)
-
-        dispGroups.delete("1.0", END)
-        dispGroups.insert("1.0", formatGroups())
-        
-    def loadGroup():
-        gName = groupName.get("1.0", END).split('\n')[0]
-        if gName in groups.keys():
+def deleteGroup():
+    gName = groupName.get("1.0", END).split('\n')[0]
+    if gName in groups.keys():
+        ans=messagebox.askokcancel(title='Confirm', message="Are you sure you want to delete the group\n"+gName)
+        if ans:
+            groups.pop(gName)
             groupFeatures.delete("1.0", END)
-            groupFeatures.insert("1.0", '\n'.join(groups[gName]))
-        else:
-            messagebox.showerror(title="Error", message="Group not found")
+        messagebox.showinfo(title="Success", message="Successfully removed group\n"+gName)
+    else:
+        messagebox.showerror(title="Error", message="Group not found")
+    dispGroups.delete("1.0", END)
+    dispGroups.insert("1.0", formatGroups())
 
-    def deleteGroup():
-        gName = groupName.get("1.0", END).split('\n')[0]
-        if gName in groups.keys():
-            ans=messagebox.askokcancel(title='Confirm', message="Are you sure you want to delete the group\n"+gName)
-            if ans:
-                groups.pop(gName)
-                groupFeatures.delete("1.0", END)
-            messagebox.showinfo(title="Success", message="Successfully removed group\n"+gName)
-        else:
-            messagebox.showerror(title="Error", message="Group not found")
-        dispGroups.delete("1.0", END)
-        dispGroups.insert("1.0", formatGroups())
-    
-    topDescriptor = Label(groupScreen, text="Name for group of features")
-    topDescriptor.pack(fill='both', side='top')
+def applyRules():
+    word = startingWord.get("1.0", END)
+    wordFeats = textToFeatures(word)
 
-    groupName = Text(groupScreen, height=1)
-    groupName.pack(fill='x', side='top')
-
-    splitter=ttk.Separator(groupScreen, orient='horizontal')
-    splitter.pack(side='top', fill='x')
-
-    featDescriptor = Label(groupScreen, text="Features in group")
-    featDescriptor.pack(fill='both', side='top')
-
-    groupFeatures = Text(groupScreen, height=20)
-    groupFeatures.pack(fill='x', side='top')
-
-    bAddGroup = Button(groupScreen, text="Add new group", height=3, command=addGroup)
-    bAddGroup.pack(fill='x', side='top')
-
-    bLoadGroup = Button(groupScreen, text="Load group", height=3, command=loadGroup)
-    bLoadGroup.pack(fill='x', side='top')
-
-    bRemoveGroup = Button(groupScreen, text="Disband group", height=3, command=deleteGroup)
-    bRemoveGroup.pack(fill='x', side='top')
-
-    
-def viewRules():
-    ruleScreen = Tk()
-    ruleScreen.title('Rules')
-    ruleScreen.geometry("150x600")
-
-    def applyRules():
-        word = startingWord.get("1.0", END)
-        wordFeats = textToFeatures(word)
-
-        for r in rules:
-            for i in range(0, len(wordFeats)):
-                for f in r[0]:
-                    valid = True
-                    if f not in wordFeats[i]:
-                        valid = False
-                        break
-                if valid:
-                    j=i
-                    if 'p' in r[1]:
-                        j+=1
-                    elif 'f' in r[1]:
-                        j-=1
-                    if j < len(wordFeats)and j >= 0:
-                        for f in r[2]:
-                            if f not in wordFeats[j]:
-                                valid = False
-                                break
-                    else:
-                        valid=False
-                if valid:
-                    if r[3] == 'assimilate':
-                        featToAssim = []
-                        for g in r[4]:
-                            if g in list(groups.keys()):
-                                featToAssim.append(groups[g])
-                            else:
-                                messagebox.showwarning(title="Not a group",
-                                                       message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
-                                groups[g] = [g]
-                                featToAssim.append([g])
-                        for grup in featToAssim:
-                            for feat in grup:
-                                while feat in wordFeats[i]:
-                                    wordFeats[i].remove(feat)
-                                if feat in wordFeats[j]:
-                                    wordFeats[i].append(feat)
-                                    
-                    elif r[3] == 'propagate':
-                        featToProp = []
-                        for g in r[4]:
-                            if g in list(groups.keys()):
-                                featToProp.append(groups[g])
-                            else:
-                                messagebox.showwarning(title="Not a group",
-                                                       message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
-                                groups[g] = [g]
-                                featToProp.append([g])
+    for r in rules:
+        for i in range(0, len(wordFeats)):
+            for f in r[0]:
+                valid = True
+                if f not in wordFeats[i]:
+                    valid = False
+                    break
+            if valid:
+                j=i
+                if 'p' in r[1]:
+                    j+=1
+                elif 'f' in r[1]:
+                    j-=1
+                if j < len(wordFeats)and j >= 0:
+                    for f in r[2]:
+                        if f not in wordFeats[j]:
+                            valid = False
+                            break
+                else:
+                    valid=False
+            if valid:
+                if r[3] == 'assimilate':
+                    featToAssim = []
+                    for g in r[4]:
+                        if g in list(groups.keys()):
+                            featToAssim.append(groups[g])
+                        else:
+                            messagebox.showwarning(title="Not a group",
+                                                   message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
+                            groups[g] = [g]
+                            featToAssim.append([g])
+                    for grup in featToAssim:
+                        for feat in grup:
+                            while feat in wordFeats[i]:
+                                wordFeats[i].remove(feat)
+                            if feat in wordFeats[j]:
+                                wordFeats[i].append(feat)
+                                
+                elif r[3] == 'propagate':
+                    featToProp = []
+                    for g in r[4]:
+                        if g in list(groups.keys()):
+                            featToProp.append(groups[g])
+                        else:
+                            messagebox.showwarning(title="Not a group",
+                                                   message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
+                            groups[g] = [g]
+                            featToProp.append([g])
 
 
-                        allOrNext = 'next' in r[5]
-                        allSounds = 'sound' in r[5]
-                        for k in range(i+1, len(wordFeats)):
-                            vowelComp = 'vowel' in wordFeats[k] and 'vowel' in r[5]
-                            consComp = 'consonant' in wordFeats[k] and 'consonant' in r[5]
-                            if (vowelComp or consComp or allSounds) and allOrNext:
-                                for grup in featToProp:
-                                    for feat in grup:
-                                        while feat in wordFeats[k]:
-                                            wordFeats[k].remove(feat)
-                                        if feat in wordFeats[i]:
-                                            wordFeats[k].append(feat)
+                    allOrNext = 'next' in r[5]
+                    allSounds = 'sound' in r[5]
+                    for k in range(i+1, len(wordFeats)):
+                        vowelComp = 'vowel' in wordFeats[k] and 'vowel' in r[5]
+                        consComp = 'consonant' in wordFeats[k] and 'consonant' in r[5]
+                        if (vowelComp or consComp or allSounds) and allOrNext:
+                            for grup in featToProp:
+                                for feat in grup:
+                                    while feat in wordFeats[k]:
+                                        wordFeats[k].remove(feat)
+                                    if feat in wordFeats[i]:
+                                        wordFeats[k].append(feat)
 
-                                if allOrNext:
-                                    allOrNext = 'all' in r[5]
+                            if allOrNext:
+                                allOrNext = 'all' in r[5]
 
-                    elif r[3] == 'delete':
-                        k=i
-                        if 'previous' in r[5]:
-                            k-=1
-                        elif 'next' in r[5]:
-                            k+=1
-                        wordFeats.pop(k)
+                elif r[3] == 'delete':
+                    k=i
+                    if 'previous' in r[5]:
+                        k-=1
+                    elif 'next' in r[5]:
+                        k+=1
+                    wordFeats.pop(k)
 
-                    elif r[3] == 'insert':
-                        wordFeats.insert(max(i, j), r[4])
+                elif r[3] == 'insert':
+                    wordFeats.insert(max(i, j), r[4])
 
-                    elif r[3] == 'add/subtract feature':
-                        for f in r[4]:
-                            for g in groups.keys():
-                                if f in groups[g]:
-                                    for k in groups[g]:
-                                        while k in wordFeats[i]:
-                                            wordFeats[i].remove(k)
-                            if f not in wordFeats[i]:
-                                wordFeats[i].append(f)
-                        for f in r[5]:
-                            while f in wordFeats[i]:
-                                wordFeats[i].remove(f)
-                            
-        print(wordFeats)
+                elif r[3] == 'add/subtract feature':
+                    for f in r[4]:
+                        for g in groups.keys():
+                            if f in groups[g]:
+                                for k in groups[g]:
+                                    while k in wordFeats[i]:
+                                        wordFeats[i].remove(k)
+                        if f not in wordFeats[i]:
+                            wordFeats[i].append(f)
+                    for f in r[5]:
+                        while f in wordFeats[i]:
+                            wordFeats[i].remove(f)
+                        
+    print(wordFeats)
 
-        endingWord.delete("1.0", END)
-        endingWord.insert("1.0", featuresToText(wordFeats))
-        dispGroups.delete("1.0", END)
-        dispGroups.insert("1.0", formatGroups())
-        dispFeatures.delete("1.0", END)
-        dispFeatures.insert("1.0", formatChars())
+    endingWord.delete("1.0", END)
+    endingWord.insert("1.0", featuresToText(wordFeats))
+    dispGroups.delete("1.0", END)
+    dispGroups.insert("1.0", formatGroups())
+    dispFeatures.delete("1.0", END)
+    dispFeatures.insert("1.0", formatChars())
         
-
-    startingWord = Text(ruleScreen, height=1)
-    startingWord.pack(fill='x', side='top')
-
-    goButton = Button(ruleScreen, text="GO!", command=applyRules, height=2)
-    goButton.pack(fill='x', side='top')
-
-    ruleFrames = []
-    for i in range(0, len(rules)):
-        ruleFrames.append([])
-        ruleFrames[i].append(Frame(ruleScreen, height=2, width=10))
-        ruleFrames[i][0].pack(fill='x', side='top')
-        ruleFrames[i].append(Label(ruleFrames[i][0], text=formatRule(rules[i])))
-        ruleFrames[i][1].pack(fill='both', side='left')
-        
-
-    endingWord = Text(ruleScreen, height=2)
-    endingWord.pack(fill='x', side='top')
-
 def formatRule(ruleArray):
     ruleStr = 'if '
     ruleStr+=' +'.join(ruleArray[0])
@@ -652,8 +552,19 @@ def formatRule(ruleArray):
             makeNewline = False
     toReturn+=ruleStr[lastSpace:len(ruleStr)]
     return toReturn
+
+def updateRuleBox():
+    for i in range(0, len(rules)):
+        ruleText = formatRule(rules[i])
+        while '\n' in ruleText:
+            ruleText=ruleText.replace('\n', ' ')
+        ruleBox.delete(i)
+        ruleBox.insert(i, ruleText)
             
 menuBar = Menu(root)
+
+root['bg'] = '#a3ccf4'
+baseBg = "#6389df"
 
 fileBar = Menu(menuBar)
 fileBar.add_command(label="Save Characters", command=saveChars)
@@ -667,66 +578,159 @@ root.config(menu=menuBar)
 
 viewBar = Menu(menuBar)
 viewBar.add_command(label="View IPA Chart", command=viewIPA)
-viewBar.add_command(label="View Rules", command=viewRules)
 menuBar.add_cascade(label='View', menu=viewBar)
 
-bAdd = Button(root, text = "Add character\nand features\nto logs", command = addSound) 
-bAdd.place(relx = 1, height = 75, width = 100, x =-125, y = 125, anchor = NE)
+##Frame that everything but rule inputs is in
+topFrame = Frame(root, width=1000, height=420, bg=baseBg)
+labelBg = '#bebcc1'
 
-bLoad = Button(root, text = "Load character\nfrom logs", command=loadSound)
-bLoad.place(relx=1, height=75, width=100, x=-125, y=200, anchor=NE)
+##Make frame for adding tokens
+charFrame = Frame(topFrame, width=400, height=400, bg=baseBg, bd=2)
+charInputFrame = Frame(charFrame, width=100, height=400, bg=baseBg)
 
-bRemove = Button(root, text="Remove character\n from logs", command=removeSound)
-bRemove.place(relx=1, height=75, width=100, x=-125, y=275, anchor=NE)
+charLbl = Label(charInputFrame, text = "Character")
+charLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
 
-charInput = Text(root)
-charInput.place(height=25, width=100, relx=1, x=-125, y=50, anchor = NE)
+charInput = Text(charInputFrame, width=15, height=1)
+charInput.tag_configure("center", justify='center')
+charInput.tag_add("center", "1.0", END)
+charInput.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(height=25, width=100, relx=1, x=-125, y=50, anchor = NE)
 
-charLbl = Label(root, text = "Character")
-charLbl.place(relx = 1, x = -144, y=80, anchor=NE)
+attrLbl = Label(charInputFrame, text="Features")
+attrLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx = 1, x = -33, y=255, anchor=NE)
 
-attrInput = Text(root)
-attrInput.place(height=200, width = 100, relx=1, x=-10, y=50, anchor = NE)
+attrInput = Text(charInputFrame, width=15, height=20)
+attrInput.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(height=200, width = 100, relx=1, x=-10, y=50, anchor = NE)
 
-attrLbl = Label(root, text="Features")
-attrLbl.place(relx = 1, x = -33, y=255, anchor=NE)
+bAdd = Button(charInputFrame, height=2, text = "Add character and\nfeatures to logs", command = addSound) 
+bAdd.pack(fill='both', side='top')#lace(relx = 1, height = 75, width = 100, x =-125, y = 125, anchor = NE)
 
-dispFeatures = Text(root)
-dispFeatures.place(height=300, width=350, relx = 1, x=-600, y=50, anchor=NW)
+bLoad = Button(charInputFrame, height=2, text = "Load character\nfrom logs", command=loadSound)
+bLoad.pack( fill='both', side='top')#lace(relx=1, height=75, width=100, x=-125, y=200, anchor=NE)
 
-scrollb = Scrollbar(command=dispFeatures.yview)
-scrollb.place(height=300, width=10, relx = 1, x=-250, y=50, anchor=NW)
+bRemove = Button(charInputFrame,height=2, text="Remove character\n from logs", command=removeSound)
+bRemove.pack(fill='both', side='top')#lace(relx=1, height=75, width=100, x=-125, y=275, anchor=NE)
+
+charInputFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')
+
+dispFeatures = Text(charFrame, height=20, width=30)
+scrollb = Scrollbar(charFrame, command=dispFeatures.yview)
+scrollb.pack(ipady=2, pady=2, fill='y', side='left')
+
 dispFeatures['yscrollcommand']=scrollb.set
+dispFeatures.pack(ipady=2, pady=2, fill='both', side='left')
+dispFeatures.insert("1.0", "No characters listed yet!")
 
-dispGroups = Text(root)
-dispGroups.place(height=150, width=300, relx=1, x=-10, y=425, anchor=NE)
-dispGroups.insert("1.0", "No feature groups yet!")
-groupScrollB = Scrollbar(command=dispGroups.yview)
-groupScrollB.place(height=150, width=10, relx=1, x=-10, y=425, anchor=NE)
-dispGroups['yscrollcommand']=groupScrollB.set
+charFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='left', anchor='nw')
+
+##Make frame for showing rules
+
+ruleDisp = Frame(topFrame, width=300, height=400, bg='#a3ccf4')
+
+startWordLbl = Label(ruleDisp, width=10, height=1, text="Input Word")
+startWordLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='top')
+
+startingWord = Text(ruleDisp, height=1, width=20)
+startingWord.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
+
+goButton = Button(ruleDisp, text="GO!", command=applyRules, height=2)
+goButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
+
+ruleFrames = []
+
+ruleBox = Listbox(ruleDisp, height=20, width=20)
+
+ruleBox.insert(1, "Rules go here!")
     
-bAddRule = Button(root, text="Create new rule", command=addRuleWindow)
-bAddRule.place(height=50, width=150, relx = 1, x = -300, y=400, anchor=CENTER)
+ruleScrollX = Scrollbar(ruleDisp, command=ruleBox.xview, orient='horizontal')
+ruleBox['xscrollcommand'] = ruleScrollX.set
 
-bAddGrouping = Button(root, text='Add new feature grouping', command=addGroupWindow)
-bAddGrouping.place(height=50, width=150, relx=1, x=-150, y=400, anchor=CENTER)
+ruleBox.pack(ipadx=2, ipady=2, padx=2, pady=2, side='top', fill='x')
+ruleScrollX.pack(ipadx=2, ipady=2, padx=2, pady=2, side="top", fill='x')
 
-viewRules()
+endingWord = Text(ruleDisp, height=2, width=20)
+endingWord.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='bottom')
+
+endWordLbl = Label(ruleDisp, width=11, height=1, text="Output Word")
+endWordLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='bottom')
+
+ruleDisp.pack(ipadx=2, padx=2, fill='both', side='left')
+
+##Make frame for adding groups
+groupFrame = Frame(topFrame, width=400, height=400, bg=baseBg)
+groupScreen = Frame(groupFrame, width=100, height=400, bg=baseBg)
+
+topDescriptor = Label(groupScreen, text="Feature group name")
+topDescriptor.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
+
+groupName = Text(groupScreen, height=1)
+groupName.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
+
+featDescriptor = Label(groupScreen, text="Features in group")
+featDescriptor.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
+
+groupFeatures = Text(groupScreen, height=20)
+groupFeatures.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
+
+bAddGroup = Button(groupScreen, text="Add new group", height=2, command=addGroup)
+bAddGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
+
+bLoadGroup = Button(groupScreen, text="Load group", height=2, command=loadGroup)
+bLoadGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
+
+bRemoveGroup = Button(groupScreen, text="Disband group", height=2, command=deleteGroup)
+bRemoveGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
+
+dispGroups = Text(groupFrame, width=30)
+
+groupScrollB = Scrollbar(groupFrame, command=dispGroups.yview)
+groupScrollB.pack(ipady=2, pady=2, fill='y', side='right')
+dispGroups.pack(ipady=2, pady=2, fill='both', side='right')
+dispGroups.insert("1.0", "No feature groups yet!")
+dispGroups['yscrollcommand']=groupScrollB.set
+
+groupScreen.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='right', expand=None)
+groupFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='right')
+
+##Make frame for adding rules
+ruleScreen = Frame(root, width=1000, height=150, bg='#a3ccf4')
+
+ruleLbl = Label(ruleScreen, text="if")
+ruleLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
+
+changeStart = Text(ruleScreen, height=10, width=10)
+changeStart.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='left')
+
+beforeAfterVar = StringVar(ruleScreen)
+beforeAfter = OptionMenu(ruleScreen, beforeAfterVar, "precedes", "follows", "is")
+beforeAfter.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='left')
+
+triggerAttr = Text(ruleScreen, height=10, width=10)
+triggerAttr.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='left')
+
+lblPlus = Label(ruleScreen, text=", then :")
+lblPlus.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
+
+actionVar = StringVar(ruleScreen)
+actionChoice=OptionMenu(ruleScreen, actionVar, "assimilate", "propagate", "delete", "insert", "add/subtract feature", command=updateRuleInput)
+actionChoice.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
+
+toAssimilate = Text(ruleScreen, height=10, width=10)
+propVar = StringVar(ruleScreen)
+propDistance = OptionMenu(ruleScreen, propVar, "to next consonant", "to next vowel", "to next sound", "to all consonants", "to all vowels", "to all sounds")
+delSelect = OptionMenu(ruleScreen, propVar, "previous character", "this character", "following character")
+
+lblAdd = Label(ruleScreen, text="Add")
+lblSubtract = Label(ruleScreen, text="and subtract")
+toSubtract=Text(ruleScreen, height=10, width=10)
+
+ruleButton = Button(ruleScreen, text="Add Rule", command=addRule)
+ruleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')
+
+ruleScreen.pack(fill='y', side='bottom')
+
+topFrame.pack(side='top', fill='y')
+
 viewIPA()
 
 root.mainloop()
-##changePlus = Text(root)
-##changePlus.place(height=200, width=100, relx = 1, x = -500, y=400, anchor=NW)
-
-##lblMinus = Label(root, text="-")
-##lblMinus.place(height=25, width=25, relx = 1, x = -400, y=400, anchor=NW)
-##
-##changeMinus = Text(root)
-##changeMinus.place(height=200, width=100, relx = 1, x = -375, y=400, anchor=NW)
-##
-##bGo = Button(root, text="=", command=plusMinusRuleButton)
-##bGo.place(height=50, width=50, relx = 1, x = -250, y=400, anchor=NW)
-##
-##changeEnd = Text(root)
-##changeEnd.place(height=50, width=50, relx = 1, x = -150, y=400, anchor=NW)
-##
