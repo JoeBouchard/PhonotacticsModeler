@@ -22,9 +22,10 @@ def saveChars():
 
 def saveRules():
     print(rules)
-    toSave = filedialog.asksaveasfile(filetypes=[("Rule files", "*.rlz")], defaultextension=[("Character files", "*.chr")])
+    fName = filedialog.asksaveasfilename(filetypes=[("Rule files", "*.rlz")], defaultextension=[("Character files", "*.chr")])
+    toSave = open(fName, mode='w', encoding='utf-8')
     root.update()
-    toSave.write(str(rules)+'RULEGROUPSPLIT'+str(groups), 'utf-8')
+    toSave.write(str(rules)+'RULEGROUPSPLIT'+str(groups))
     toSave.close()
 
 def loadChars():
@@ -285,18 +286,18 @@ def addRuleWindow():
     ruleLbl.pack(fill='both', side='left')
 
     changeStart = Text(ruleScreen, height=10, width=10)
-    changeStart.pack(fill='x', side='left')#lace(height=100, width=75, relx = 1, x = -570, y=20, anchor=NW)
-
+    changeStart.pack(fill='x', side='left')
+    
     beforeAfterVar = StringVar(ruleScreen)
     beforeAfter = OptionMenu(ruleScreen, beforeAfterVar, "precedes", "follows", "is")
-    beforeAfter.pack(fill='x', side='left')#lace(height=25, width=85, relx=1, x=-490, y=20)
-
+    beforeAfter.pack(fill='x', side='left')
+    
     triggerAttr = Text(ruleScreen, height=10, width=10)
-    triggerAttr.pack(fill='x', side='left')#lace(height=100, width=75, relx = 1, x = -400, y=20, anchor=NW)
-
+    triggerAttr.pack(fill='x', side='left')
+    
     lblPlus = Label(ruleScreen, text=":")
-    lblPlus.pack(fill='x', side='left')#lace(height=25, width=25, relx = 1, x = -325, y=20, anchor=NW)
-
+    lblPlus.pack(fill='x', side='left')
+    
     toAssimilate = Text(ruleScreen, height=10, width=10)
     propVar = StringVar(ruleScreen)
     propDistance = OptionMenu(ruleScreen, propVar, "to next consonant", "to next vowel", "to next sound", "to all consonants", "to all vowels", "to all sounds")
@@ -350,7 +351,7 @@ def addRuleWindow():
             
     actionVar = StringVar(ruleScreen)
     actionChoice=OptionMenu(ruleScreen, actionVar, "assimilate", "propagate", "delete", "insert", "add/subtract feature", command=update)
-    actionChoice.pack(fill='both', side='left')#lace(height=25, width=85, relx=1, x=-305, y=20)
+    actionChoice.pack(fill='both', side='left')
     ruleScreen.focus_force()
 
     def addRule():
@@ -370,23 +371,35 @@ def addRuleWindow():
                 val3.append(i)
                 
         val4 = actionVar.get()
-        
-        if val4 == 'assimilate':
-            val5 = []
-            for i in toAssimilate.get("1.0", END).split('\n'):
-                if i != '':
-                    val5.append(i)
-            newRule=[val1, val2, val3, val4, val5]
-            
-        elif val4 == 'propagate':
-            val5 = []
-            for i in toAssimilate.get("1.0", END).split('\n'):
-                if i != '':
-                    val5.append(i)
-            val6 = propVar.get()
-            newRule = [val1, val2, val3, val4, val5, val6]
+
+        val5 = None
+        val6 = None
 
         if val4 != '':
+            if val4 == 'assimilate' or val4 == 'insert':
+                val5 = []
+                for i in toAssimilate.get("1.0", END).split('\n'):
+                    if i != '':
+                        val5.append(i)
+                
+            elif val4 == 'propagate' or val4 == 'delete':
+                val5 = []
+                for i in toAssimilate.get("1.0", END).split('\n'):
+                    if i != '':
+                        val5.append(i)
+                val6 = propVar.get()
+
+            elif val4 == 'add/subtract feature':
+                val5 = []
+                for i in toAssimilate.get("1.0", END).split('\n'):
+                    if i != '':
+                        val5.append(i)
+                val6 = []
+                for i in toSubtract.get("1.0", END).split('\n'):
+                    if i != '':
+                        val6.append(i)
+            
+            newRule = [val1, val2, val3, val4, val5, val6]
             rules.append(newRule)
             messagebox.showinfo("Success!", "Added new rule:\n"+str(rules[-1]))
             print(rules)
@@ -478,7 +491,6 @@ def viewRules():
 
         for r in rules:
             for i in range(0, len(wordFeats)):
-                print(i, characters['o'])
                 for f in r[0]:
                     valid = True
                     if f not in wordFeats[i]:
@@ -514,8 +526,36 @@ def viewRules():
                                     wordFeats[i].remove(feat)
                                 if feat in wordFeats[j]:
                                     wordFeats[i].append(feat)
-                    #elif r[3] == 'propagate':
-                        
+                                    
+                    elif r[3] == 'propagate':
+                        featToProp = []
+                        for g in r[4]:
+                            if g in list(groups.keys()):
+                                featToProp.append(groups[g])
+                            else:
+                                messagebox.showwarning(title="Not a group",
+                                                       message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
+                                groups[g] = [g]
+                                featToProp.append([g])
+
+
+                        allOrNext = 'next' in r[5]
+                        allSounds = 'sound' in r[5]
+                        for k in range(i+1, len(wordFeats)):
+                            vowelComp = 'vowel' in wordFeats[k] and 'vowel' in r[5]
+                            consComp = 'consonant' in wordFeats[k] and 'consonant' in r[5]
+                            print(allOrNext)
+                            if (vowelComp or consComp or allSounds) and allOrNext:
+                                for grup in featToProp:
+                                    for feat in grup:
+                                        while feat in wordFeats[k]:
+                                            wordFeats[k].remove(feat)
+                                        if feat in wordFeats[i]:
+                                            wordFeats[k].append(feat)
+
+                                if allOrNext:
+                                    allOrNext = 'all' in r[5]
+                            
         print(wordFeats)
 
         endingWord.delete("1.0", END)
