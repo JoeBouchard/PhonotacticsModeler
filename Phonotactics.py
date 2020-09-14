@@ -586,6 +586,19 @@ def viewRules():
 
                     elif r[3] == 'insert':
                         wordFeats.insert(max(i, j), r[4])
+
+                    elif r[3] == 'add/subtract feature':
+                        for f in r[4]:
+                            for g in groups.keys():
+                                if f in groups[g]:
+                                    for k in groups[g]:
+                                        while k in wordFeats[i]:
+                                            wordFeats[i].remove(k)
+                            if f not in wordFeats[i]:
+                                wordFeats[i].append(f)
+                        for f in r[5]:
+                            while f in wordFeats[i]:
+                                wordFeats[i].remove(f)
                             
         print(wordFeats)
 
