@@ -386,6 +386,38 @@ def addRule():
     else:
         messagebox.showerror("Error", "Invalid rule. \nBlank combobox")
     updateRuleBox()
+
+def loadSelectedRule():
+    rule = rules[ruleBox.curselection()[0]]
+    changeStart.delete("1.0", END)
+    changeStart.insert("1.0", '\n'.join(rule[0]))
+
+    beforeAfterVar.set(rule[1])
+
+    triggerAttr.delete("1.0", END)
+    triggerAttr.insert("1.0", '\n'.join(rule[2]))
+
+    actionVar.set(rule[3])
+
+    updateRuleInput(rule[3])
+
+    if rule[3] != 'delete':
+        toAssimilate.delete("1.0", END)
+        toAssimilate.insert("1.0", '\n'.join(rule[4]))
+
+        if 'subtract' in rule[3]:
+            toSubtract.delete("1.0", END)
+            toSubtract.insert("1.0", '\n'.join(rule[5]))
+
+        if 'propagate' in rule[3]:
+            propVar.set(rule[5])
+
+    else:
+        propVar.set(rule[4])
+
+def delSelectedRule():
+    ruleBox.delete(ruleBox.curselection()[0])
+            
     
 def addGroup():
     gName = groupName.get("1.0", END).split('\n')[0]
@@ -695,6 +727,12 @@ groupFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='right')
 ##Make frame for adding rules
 ruleScreen = Frame(root, width=1000, height=150, bg='#a3ccf4')
 
+delRuleButton = Button(ruleScreen, text="Delete\nselected\nrule", command=delSelectedRule)
+delRuleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='left')
+
+loadRuleButton = Button(ruleScreen, text="Load\nselected\nrule", command=loadSelectedRule)
+loadRuleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='left')
+
 ruleLbl = Label(ruleScreen, text="if")
 ruleLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
 
@@ -725,9 +763,9 @@ lblSubtract = Label(ruleScreen, text="and subtract")
 toSubtract=Text(ruleScreen, height=10, width=10)
 
 ruleButton = Button(ruleScreen, text="Add Rule", command=addRule)
-ruleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')
+ruleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', expand=1, side='right')
 
-ruleScreen.pack(fill='y', side='bottom')
+ruleScreen.pack(fill='both', side='bottom')
 
 topFrame.pack(side='top', fill='y')
 
