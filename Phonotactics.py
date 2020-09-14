@@ -3,6 +3,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import ttk
 import random
+import time
 
 characters = {}
 
@@ -34,6 +35,21 @@ def saveGroups():
     root.update()
     toSave.write(str(groups))
     toSave.close()
+
+def autosave():
+    t=str(int(time.time()))
+    toSave = open('autosave'+t+'.grpz', mode='w', encoding='utf-8')
+    toSave.write(str(groups))
+    toSave.close()
+    toSave = open('autosave'+t+'.rlz', mode='w', encoding='utf-8')
+    toSave.write(str(rules))
+    toSave.close()
+    toSave = open('autosave'+t+'.chr', mode='w', encoding='utf-8')
+    toSave.write(str(characters))
+    toSave.close()
+    messagebox.showinfo(title="Autosave", message="Autosaved data as autosave"+t)
+    root.destroy()
+    ipaChart.destroy()
 
 def loadChars():
     toLoad = filedialog.askopenfilename(filetypes=[("Character files", "*.chr")])
@@ -155,10 +171,7 @@ def plusMinusRuleButton():
     changeEnd.delete("1.0", END)
     changeEnd.insert("1.0", newChar)
 
-def viewIPA():
-    ipaChart = Tk()
-    ipaChart.title("IPA Chart")
-    ipaChart.geometry("350x200")
+def startIPA():
     cons = '''pb			td		ʈɖ	cɟ	kɡ	qɢ	 	ʔ 
 m	ɱ		n		ɳ	ɲ	ŋ	ɴ		
 ʙ			r					ʀ		
@@ -207,6 +220,13 @@ aɶ\t\tɑɒ'''
             symbolsV[-1].place(height=20, width=20, relx=1, x=xcor, y=ycor)
         row += 1
     
+    ipaChart.focus_force()
+
+def hideIPA():
+    ipaChart.withdraw()
+    
+def viewIPA(event=None):
+    ipaChart.deiconify()
     ipaChart.focus_force()
 
 def textToFeatures(text):
@@ -635,6 +655,9 @@ def updateRuleBox():
             
 menuBar = Menu(root)
 
+root.bind("<F1>", viewIPA)
+root.protocol('WM_DELETE_WINDOW', autosave)
+
 root['bg'] = '#a3ccf4'
 baseBg = "#6389df"
 
@@ -649,7 +672,7 @@ menuBar.add_cascade(label="File", menu=fileBar)
 root.config(menu=menuBar)
 
 viewBar = Menu(menuBar)
-viewBar.add_command(label="View IPA Chart", command=viewIPA)
+viewBar.add_command(label="View IPA Chart \t <F1>", command=viewIPA)
 menuBar.add_cascade(label='View', menu=viewBar)
 
 ##Frame that everything but rule inputs is in
@@ -818,6 +841,12 @@ ruleScreen.pack(fill='both', side='bottom', expand=1)
 
 topFrame.pack(side='top', fill='both', expand=1)
 
+ipaChart = Tk()
+ipaChart.title("IPA Chart")
+ipaChart.geometry("350x200")
+ipaChart.protocol('WM_DELETE_WINDOW', hideIPA)
+
+startIPA()
 viewIPA()
 
 root.mainloop()
