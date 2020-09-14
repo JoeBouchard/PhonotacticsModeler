@@ -17,78 +17,95 @@ root.geometry("1050x720")
 def saveChars():
     fName = filedialog.asksaveasfilename(filetypes=[("Character files", "*.chr")], defaultextension=[("Character files", "*.chr")])
     root.update()
-    toSave = open(fName, mode='w', encoding='utf-8')
-    toSave.write(str(characters))
-    toSave.close()
+    if fName != '':
+        toSave = open(fName, mode='w', encoding='utf-8')
+        toSave.write(str(characters))
+        toSave.close()
+    else:
+        messagebox.showwarning(title="File not found", message="You did not select a file")
 
 def saveRules():
     print(rules)
     fName = filedialog.asksaveasfilename(filetypes=[("Rule files", "*.rlz")], defaultextension=[("Rule files", "*.rls")])
-    toSave = open(fName, mode='w', encoding='utf-8')
-    root.update()
-    toSave.write(str(rules))
-    toSave.close()
+    if fName != '':
+        toSave = open(fName, mode='w', encoding='utf-8')
+        root.update()
+        toSave.write(str(rules))
+        toSave.close()
+    else:
+        messagebox.showwarning(title="File not found", message="You did not select a file")
+
 
 def saveGroups():
     fName = filedialog.asksaveasfilename(filetypes=[("Groups files", "*.grpz")], defaultextension=[("Groups files", "*.grpz")])
-    toSave = open(fName, mode='w', encoding='utf-8')
-    root.update()
-    toSave.write(str(groups))
-    toSave.close()
+    if fName != '':
+        toSave = open(fName, mode='w', encoding='utf-8')
+        root.update()
+        toSave.write(str(groups))
+        toSave.close()
+    else:
+        messagebox.showwarning(title="File not found", message="You did not select a file")
+
 
 def autosave():
     t=str(int(time.time()))
-    toSave = open('autosave'+t+'.grpz', mode='w', encoding='utf-8')
-    toSave.write(str(groups))
-    toSave.close()
-    toSave = open('autosave'+t+'.rlz', mode='w', encoding='utf-8')
-    toSave.write(str(rules))
-    toSave.close()
-    toSave = open('autosave'+t+'.chr', mode='w', encoding='utf-8')
-    toSave.write(str(characters))
-    toSave.close()
-    messagebox.showinfo(title="Autosave", message="Autosaved data as autosave"+t)
-    root.destroy()
-    ipaChart.destroy()
+    yn=messagebox.askyesnocancel("Save?", message="Would you like to save your data?")
+    if yn:
+        saveChars()
+        saveRules()
+        saveGroups()
+    if yn != None:
+        root.destroy()
+        ipaChart.destroy()
 
 def loadChars():
     toLoad = filedialog.askopenfilename(filetypes=[("Character files", "*.chr")])
     root.update()
-    file = open(toLoad, 'r', encoding='utf-8')
-    toReturn = eval(file.read())
-    file.close()
-    print(toReturn)
-    for i in toReturn:
-        characters[i] = toReturn[i]
-    dispFeatures.delete("1.0", END)
-    dispFeatures.insert("1.0", formatChars())
+    if toLoad != '':
+        file = open(toLoad, 'r', encoding='utf-8')
+        toReturn = eval(file.read())
+        file.close()
+        print(toReturn)
+        for i in toReturn:
+            characters[i] = toReturn[i]
+        dispFeatures.delete("1.0", END)
+        dispFeatures.insert("1.0", formatChars())
+    else:
+        messagebox.showwarning(title="File not found", message="You did not select a file")
+
 
 def loadRules():
     toLoad = filedialog.askopenfilename(filetypes=[("Rule files", "*.rlz")])
     root.update()
-    file = open(toLoad, 'r')
-    contents=file.read()
-    if 'RULEGROUPSPLIT' in contents:
-        contents=contents.split('RULEGROUPSPLIT')[0]
-    loadedRules = eval(contents)
-    file.close()
-    for i in loadedRules:
-        rules.append(i)
-    updateRuleBox()
-    dispGroups.delete("1.0", END)
-    dispGroups.insert("1.0", formatGroups())
+    if toLoad != '':
+        file = open(toLoad, 'r')
+        contents=file.read()
+        loadedRules = eval(contents)
+        file.close()
+        for i in loadedRules:
+            rules.append(i)
+        updateRuleBox()
+        dispGroups.delete("1.0", END)
+        dispGroups.insert("1.0", formatGroups())
+    else:
+        messagebox.showwarning(title="File not found", message="You did not select a file")
+
 
 def loadGroups():
     toLoad = filedialog.askopenfilename(filetypes=[("Groups files", "*.grpz")])
     root.update()
-    file = open(toLoad, 'r', encoding='utf-8')
-    toReturn = eval(file.read())
-    file.close()
-    print(toReturn)
-    for i in toReturn:
-        groups[i] = toReturn[i]
-    dispGroups.delete("1.0", END)
-    dispGroups.insert("1.0", formatGroups())
+    if toLoad != '':
+        file = open(toLoad, 'r', encoding='utf-8')
+        toReturn = eval(file.read())
+        file.close()
+        print(toReturn)
+        for i in toReturn:
+            groups[i] = toReturn[i]
+        dispGroups.delete("1.0", END)
+        dispGroups.insert("1.0", formatGroups())
+    else:
+        messagebox.showwarning(title="File not found", message="You did not select a file")
+
 
 def formatDict(toFormat):
     toReturn = ''
@@ -470,7 +487,7 @@ def loadSelectedRule():
         propVar.set(rule[4])
 
 def delSelectedRule():
-    rules.pop(ruleBox.curselection()[0]-1)
+    rules.pop(ruleBox.curselection()[0])
     updateRuleBox()
             
     
@@ -519,7 +536,8 @@ def applyRules():
     wordFeats = textToFeatures(word)
 
     for r in rules:
-        for i in range(0, len(wordFeats)-1):
+        for i in range(0, len(wordFeats)):
+            valid=True
             for f in r[0]:
                 valid = True
                 if f not in wordFeats[i]:
@@ -595,7 +613,15 @@ def applyRules():
                 elif r[3] == 'insert':
                     wordFeats.insert(max(i, j), r[4])
 
-                elif r[3] == 'add/subtract feature':
+                else:
+                    for f in r[5]:
+                        for g in groups.keys():
+                            if f == g:
+                                for k in groups[g]:
+                                    while k in wordFeats[i]:
+                                        wordFeats[i].remove(k)
+                        while f in wordFeats[i]:
+                            wordFeats[i].remove(k)
                     for f in r[4]:
                         for g in groups.keys():
                             if f in groups[g]:
@@ -603,11 +629,8 @@ def applyRules():
                                     while k in wordFeats[i]:
                                         wordFeats[i].remove(k)
                         if f not in wordFeats[i]:
+                            print(f)
                             wordFeats[i].append(f)
-                    for f in r[5]:
-                        while f in wordFeats[i]:
-                            wordFeats[i].remove(f)
-                        
     print(wordFeats)
 
     endingWord.delete("1.0", END)
