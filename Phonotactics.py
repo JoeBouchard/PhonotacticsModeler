@@ -333,7 +333,7 @@ def updateRuleInput(value):
         lblSubtract.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
         toSubtract.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left')
 
-def addRule():
+def createRule():
     newRule = []
     val1 = []
     val3 = []
@@ -381,12 +381,46 @@ def addRule():
                     val6.append(i)
         
         newRule = [val1, val2, val3, val4, val5, val6]
+        return newRule
+    return -1
+
+def addRule():
+    newRule = createRule()
+    if newRule != -1:
         rules.append(newRule)
         messagebox.showinfo("Success!", "Added new rule:\n"+str(rules[-1]))
     else:
         messagebox.showerror("Error", "Invalid rule. \nBlank combobox")
     updateRuleBox()
 
+def addRuleSel():
+    newRule = createRule()
+    if newRule != -1:
+        rules.insert(ruleBox.curselection()[0], newRule)
+        messagebox.showinfo("Success!", "Added new rule:\n"+str(rules[-1]))
+    else:
+        messagebox.showerror("Error", "Invalid rule. \nBlank combobox")
+    updateRuleBox()
+
+def moveRuleUp():
+    i = ruleBox.curselection()[0]
+    if i > 0:
+        k = rules[i-1]
+        rules[i-1] = rules[i]
+        rules[i] = k
+        updateRuleBox()
+    ruleBox.select_set(i-1)
+
+def moveRuleDown():
+    i = ruleBox.curselection()[0]
+    if i < len(rules)-1:
+        k = rules[i+1]
+        rules[i+1] = rules[i]
+        rules[i] = k
+        updateRuleBox()
+    ruleBox.select_set(i+1)
+
+    
 def loadSelectedRule():
     rule = rules[ruleBox.curselection()[0]]
     changeStart.delete("1.0", END)
@@ -416,7 +450,8 @@ def loadSelectedRule():
         propVar.set(rule[4])
 
 def delSelectedRule():
-    ruleBox.delete(ruleBox.curselection()[0])
+    rules.pop(ruleBox.curselection()[0]-1)
+    updateRuleBox()
             
     
 def addGroup():
@@ -462,7 +497,7 @@ def applyRules():
     wordFeats = textToFeatures(word)
 
     for r in rules:
-        for i in range(0, len(wordFeats)):
+        for i in range(0, len(wordFeats)-1):
             for f in r[0]:
                 valid = True
                 if f not in wordFeats[i]:
@@ -586,12 +621,15 @@ def formatRule(ruleArray):
     return toReturn
 
 def updateRuleBox():
+    for j in range(0, len(rules)+5):
+        ruleBox.delete(j)
     for i in range(0, len(rules)):
-        ruleText = formatRule(rules[i])
+        ruleText = str(i+1)+". "+formatRule(rules[i])
         while '\n' in ruleText:
             ruleText=ruleText.replace('\n', ' ')
         ruleBox.delete(i)
         ruleBox.insert(i, ruleText)
+    
             
 menuBar = Menu(root)
 
@@ -632,7 +670,7 @@ attrLbl = Label(charInputFrame, text="Features")
 attrLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(relx = 1, x = -33, y=255, anchor=NE)
 
 attrInput = Text(charInputFrame, width=15, height=20)
-attrInput.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')#lace(height=200, width = 100, relx=1, x=-10, y=50, anchor = NE)
+attrInput.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top', expand=1)#lace(height=200, width = 100, relx=1, x=-10, y=50, anchor = NE)
 
 bAdd = Button(charInputFrame, height=2, text = "Add character and\nfeatures to logs", command = addSound) 
 bAdd.pack(fill='both', side='top')#lace(relx = 1, height = 75, width = 100, x =-125, y = 125, anchor = NE)
@@ -641,19 +679,55 @@ bLoad = Button(charInputFrame, height=2, text = "Load character\nfrom logs", com
 bLoad.pack( fill='both', side='top')#lace(relx=1, height=75, width=100, x=-125, y=200, anchor=NE)
 
 bRemove = Button(charInputFrame,height=2, text="Remove character\n from logs", command=removeSound)
-bRemove.pack(fill='both', side='top')#lace(relx=1, height=75, width=100, x=-125, y=275, anchor=NE)
+bRemove.pack(fill='both', side='top', expand=1)#lace(relx=1, height=75, width=100, x=-125, y=275, anchor=NE)
 
-charInputFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')
 
 dispFeatures = Text(charFrame, height=20, width=30)
 scrollb = Scrollbar(charFrame, command=dispFeatures.yview)
 scrollb.pack(ipady=2, pady=2, fill='y', side='left')
 
 dispFeatures['yscrollcommand']=scrollb.set
-dispFeatures.pack(ipady=2, pady=2, fill='both', side='left')
+dispFeatures.pack(ipady=2, pady=2, fill='both', side='left', expand=1)
 dispFeatures.insert("1.0", "No characters listed yet!")
 
-charFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='left', anchor='nw')
+charInputFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')#, expand=1)
+charFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='left', anchor='nw', expand=1)
+
+##Make frame for adding groups
+groupFrame = Frame(topFrame, width=400, height=400, bg=baseBg)
+groupScreen = Frame(groupFrame, width=100, height=400, bg=baseBg)
+
+topDescriptor = Label(groupScreen, text="Feature group name")
+topDescriptor.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
+
+groupName = Text(groupScreen, height=1, width=10)
+groupName.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
+
+featDescriptor = Label(groupScreen, text="Features in group")
+featDescriptor.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
+
+groupFeatures = Text(groupScreen, height=20, width=20)
+groupFeatures.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top', expand=1)
+
+bAddGroup = Button(groupScreen, text="Add new group", height=2, command=addGroup)
+bAddGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
+
+bLoadGroup = Button(groupScreen, text="Load group", height=2, command=loadGroup)
+bLoadGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
+
+bRemoveGroup = Button(groupScreen, text="Disband group", height=2, command=deleteGroup)
+bRemoveGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
+
+dispGroups = Text(groupFrame, width=30)
+
+groupScrollB = Scrollbar(groupFrame, command=dispGroups.yview)
+groupScrollB.pack(ipady=2, pady=2, fill='y', side='right')
+dispGroups.pack(ipady=2, pady=2, fill='both', side='right', expand=1)
+dispGroups.insert("1.0", "No feature groups yet!")
+dispGroups['yscrollcommand']=groupScrollB.set
+
+groupScreen.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')
+groupFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right', expand=1)
 
 ##Make frame for showing rules
 
@@ -670,14 +744,14 @@ goButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
 
 ruleFrames = []
 
-ruleBox = Listbox(ruleDisp, height=20, width=20)
+ruleBox = Listbox(ruleDisp, height=15, width=20)
 
 ruleBox.insert(1, "Rules go here!")
     
 ruleScrollX = Scrollbar(ruleDisp, command=ruleBox.xview, orient='horizontal')
 ruleBox['xscrollcommand'] = ruleScrollX.set
 
-ruleBox.pack(ipadx=2, ipady=2, padx=2, pady=2, side='top', fill='x')
+ruleBox.pack(ipadx=2, ipady=2, padx=2, pady=2, side='top', fill='both', expand=1)
 ruleScrollX.pack(ipadx=2, ipady=2, padx=2, pady=2, side="top", fill='x')
 
 endingWord = Text(ruleDisp, height=2, width=20)
@@ -686,43 +760,13 @@ endingWord.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='bottom')
 endWordLbl = Label(ruleDisp, width=11, height=1, text="Output Word")
 endWordLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='bottom')
 
-ruleDisp.pack(ipadx=2, padx=2, fill='both', side='left')
+moveDownButton = Button(ruleDisp, command=moveRuleDown, height=1, text="v Move rule down v")
+moveDownButton.pack(fill='x', side='bottom')
 
-##Make frame for adding groups
-groupFrame = Frame(topFrame, width=400, height=400, bg=baseBg)
-groupScreen = Frame(groupFrame, width=100, height=400, bg=baseBg)
+moveUpButton = Button(ruleDisp, command=moveRuleUp, height=1, text="^ Move rule up ^")
+moveUpButton.pack(fill='x', side='bottom')
 
-topDescriptor = Label(groupScreen, text="Feature group name")
-topDescriptor.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
-
-groupName = Text(groupScreen, height=1)
-groupName.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
-
-featDescriptor = Label(groupScreen, text="Features in group")
-featDescriptor.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='top')
-
-groupFeatures = Text(groupScreen, height=20)
-groupFeatures.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='top')
-
-bAddGroup = Button(groupScreen, text="Add new group", height=2, command=addGroup)
-bAddGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
-
-bLoadGroup = Button(groupScreen, text="Load group", height=2, command=loadGroup)
-bLoadGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
-
-bRemoveGroup = Button(groupScreen, text="Disband group", height=2, command=deleteGroup)
-bRemoveGroup.pack(ipadx=0, ipady=0, padx=0, pady=0, fill='x', side='top')
-
-dispGroups = Text(groupFrame, width=30)
-
-groupScrollB = Scrollbar(groupFrame, command=dispGroups.yview)
-groupScrollB.pack(ipady=2, pady=2, fill='y', side='right')
-dispGroups.pack(ipady=2, pady=2, fill='both', side='right')
-dispGroups.insert("1.0", "No feature groups yet!")
-dispGroups['yscrollcommand']=groupScrollB.set
-
-groupScreen.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='right', expand=None)
-groupFrame.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='right')
+ruleDisp.pack(ipadx=2, padx=2, fill='both', side='left', expand=1)
 
 ##Make frame for adding rules
 ruleScreen = Frame(root, width=1000, height=150, bg='#a3ccf4')
@@ -736,14 +780,14 @@ loadRuleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='y', side='left')
 ruleLbl = Label(ruleScreen, text="if")
 ruleLbl.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
 
-changeStart = Text(ruleScreen, height=10, width=10)
+changeStart = Text(ruleScreen, height=10, width=11)
 changeStart.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='left')
 
 beforeAfterVar = StringVar(ruleScreen)
 beforeAfter = OptionMenu(ruleScreen, beforeAfterVar, "precedes", "follows", "is")
 beforeAfter.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='left')
 
-triggerAttr = Text(ruleScreen, height=10, width=10)
+triggerAttr = Text(ruleScreen, height=10, width=11)
 triggerAttr.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='x', side='left')
 
 lblPlus = Label(ruleScreen, text=", then :")
@@ -753,21 +797,24 @@ actionVar = StringVar(ruleScreen)
 actionChoice=OptionMenu(ruleScreen, actionVar, "assimilate", "propagate", "delete", "insert", "add/subtract feature", command=updateRuleInput)
 actionChoice.pack(ipadx=2, ipady=2, padx=2, pady=2, fill=None, side='left')
 
-toAssimilate = Text(ruleScreen, height=10, width=10)
+toAssimilate = Text(ruleScreen, height=10, width=11)
 propVar = StringVar(ruleScreen)
 propDistance = OptionMenu(ruleScreen, propVar, "to next consonant", "to next vowel", "to next sound", "to all consonants", "to all vowels", "to all sounds")
 delSelect = OptionMenu(ruleScreen, propVar, "previous character", "this character", "following character")
 
 lblAdd = Label(ruleScreen, text="Add")
 lblSubtract = Label(ruleScreen, text="and subtract")
-toSubtract=Text(ruleScreen, height=10, width=10)
+toSubtract=Text(ruleScreen, height=10, width=11)
+
+ruleButtonSelection = Button(ruleScreen, text="Add\nRule\nAbove\nSelection", command=addRuleSel)
+ruleButtonSelection.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', side='right')
 
 ruleButton = Button(ruleScreen, text="Add Rule", command=addRule)
 ruleButton.pack(ipadx=2, ipady=2, padx=2, pady=2, fill='both', expand=1, side='right')
 
-ruleScreen.pack(fill='both', side='bottom')
+ruleScreen.pack(fill='both', side='bottom', expand=1)
 
-topFrame.pack(side='top', fill='y')
+topFrame.pack(side='top', fill='both', expand=1)
 
 viewIPA()
 
