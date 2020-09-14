@@ -460,6 +460,8 @@ def addGroup():
         ans=messagebox.askokcancel(title="Already exists", message="A group already exists with this name.\nDo you want to overwrite it?")
         if not ans:
             return -1
+        else:
+            groups[gName] = []
     else:
         groups[gName] = []
         
@@ -679,7 +681,7 @@ bLoad = Button(charInputFrame, height=2, text = "Load character\nfrom logs", com
 bLoad.pack( fill='both', side='top')#lace(relx=1, height=75, width=100, x=-125, y=200, anchor=NE)
 
 bRemove = Button(charInputFrame,height=2, text="Remove character\n from logs", command=removeSound)
-bRemove.pack(fill='both', side='top', expand=1)#lace(relx=1, height=75, width=100, x=-125, y=275, anchor=NE)
+bRemove.pack(fill='both', side='top')#lace(relx=1, height=75, width=100, x=-125, y=275, anchor=NE)
 
 
 dispFeatures = Text(charFrame, height=20, width=30)
