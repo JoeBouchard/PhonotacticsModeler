@@ -22,10 +22,17 @@ def saveChars():
 
 def saveRules():
     print(rules)
-    fName = filedialog.asksaveasfilename(filetypes=[("Rule files", "*.rlz")], defaultextension=[("Character files", "*.chr")])
+    fName = filedialog.asksaveasfilename(filetypes=[("Rule files", "*.rlz")], defaultextension=[("Rule files", "*.rls")])
     toSave = open(fName, mode='w', encoding='utf-8')
     root.update()
-    toSave.write(str(rules)+'RULEGROUPSPLIT'+str(groups))
+    toSave.write(str(rules))
+    toSave.close()
+
+def saveGroups():
+    fName = filedialog.asksaveasfilename(filetypes=[("Groups files", "*.grpz")], defaultextension=[("Groups files", "*.grpz")])
+    toSave = open(fName, mode='w', encoding='utf-8')
+    root.update()
+    toSave.write(str(groups))
     toSave.close()
 
 def loadChars():
@@ -44,18 +51,28 @@ def loadRules():
     toLoad = filedialog.askopenfilename(filetypes=[("Rule files", "*.rlz")])
     root.update()
     file = open(toLoad, 'r')
-    contents=file.read().split('RULEGROUPSPLIT')
-    loadedRules = eval(contents[0])
+    contents=file.read()
+    if 'RULEGROUPSPLIT' in contents:
+        contents=contents.split('RULEGROUPSPLIT')[0]
+    loadedRules = eval(contents)
     file.close()
     for i in loadedRules:
         rules.append(i)
-    print(rules)
-    loadedGroups = eval(contents[1])
-    for i in loadedGroups:
-        groups[i] = loadedGroups[i]
     dispGroups.delete("1.0", END)
     dispGroups.insert("1.0", formatGroups())
     viewRules()
+
+def loadGroups():
+    toLoad = filedialog.askopenfilename(filetypes=[("Groups files", "*.grpz")])
+    root.update()
+    file = open(toLoad, 'r', encoding='utf-8')
+    toReturn = eval(file.read())
+    file.close()
+    print(toReturn)
+    for i in toReturn:
+        groups[i] = toReturn[i]
+    dispGroups.delete("1.0", END)
+    dispGroups.insert("1.0", formatGroups())
 
 def formatDict(toFormat):
     toReturn = ''
@@ -628,8 +645,10 @@ menuBar = Menu(root)
 fileBar = Menu(menuBar)
 fileBar.add_command(label="Save Characters", command=saveChars)
 fileBar.add_command(label="Save Rules", command=saveRules)
+fileBar.add_command(label="Save Groups", command=saveGroups)
 fileBar.add_command(label="Load Characters", command=loadChars)
 fileBar.add_command(label="Load Rules", command=loadRules)
+fileBar.add_command(label="Load Groups", command=loadGroups)
 menuBar.add_cascade(label="File", menu=fileBar)
 root.config(menu=menuBar)
 
