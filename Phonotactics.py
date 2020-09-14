@@ -120,7 +120,6 @@ def plusMinusRule(start, plus, minus):
     for i in ['', ' ', '\n']:
         while i in features:
             features.remove(i)
-    print(features)
     for token in characters.keys():
         found = True
         for feat in characters[token]:
@@ -376,11 +375,17 @@ def addRuleWindow():
         val6 = None
 
         if val4 != '':
+            print(val4)
             if val4 == 'assimilate' or val4 == 'insert':
                 val5 = []
                 for i in toAssimilate.get("1.0", END).split('\n'):
                     if i != '':
                         val5.append(i)
+                print(len(val5))
+                if len(val5) == 1 and val4 == 'insert':
+                    print(val5)
+                    val5 = textToFeatures(val5[0])[0]
+                    print(val5[0])
                 
             elif val4 == 'propagate' or val4 == 'delete':
                 val5 = []
@@ -402,7 +407,6 @@ def addRuleWindow():
             newRule = [val1, val2, val3, val4, val5, val6]
             rules.append(newRule)
             messagebox.showinfo("Success!", "Added new rule:\n"+str(rules[-1]))
-            print(rules)
             viewRules()
         else:
             messagebox.showerror("Error", "Invalid rule. \nBlank combobox")
@@ -500,9 +504,9 @@ def viewRules():
                     j=i
                     if 'p' in r[1]:
                         j+=1
-                    else:
+                    elif 'f' in r[1]:
                         j-=1
-                    if j < len(wordFeats)and j > 0:
+                    if j < len(wordFeats)and j >= 0:
                         for f in r[2]:
                             if f not in wordFeats[j]:
                                 valid = False
@@ -519,7 +523,7 @@ def viewRules():
                                 messagebox.showwarning(title="Not a group",
                                                        message="No group titled:\t"+g+"\nAssimilating "+g+"as a feature.")
                                 groups[g] = [g]
-                                featsToAssim.append([g])
+                                featToAssim.append([g])
                         for grup in featToAssim:
                             for feat in grup:
                                 while feat in wordFeats[i]:
@@ -544,7 +548,6 @@ def viewRules():
                         for k in range(i+1, len(wordFeats)):
                             vowelComp = 'vowel' in wordFeats[k] and 'vowel' in r[5]
                             consComp = 'consonant' in wordFeats[k] and 'consonant' in r[5]
-                            print(allOrNext)
                             if (vowelComp or consComp or allSounds) and allOrNext:
                                 for grup in featToProp:
                                     for feat in grup:
@@ -555,6 +558,17 @@ def viewRules():
 
                                 if allOrNext:
                                     allOrNext = 'all' in r[5]
+
+                    elif r[3] == 'delete':
+                        k=i
+                        if 'previous' in r[5]:
+                            k-=1
+                        elif 'next' in r[5]:
+                            k+=1
+                        wordFeats.pop(k)
+
+                    elif r[3] == 'insert':
+                        wordFeats.insert(max(i, j), r[4])
                             
         print(wordFeats)
 
@@ -579,7 +593,6 @@ def viewRules():
         ruleFrames[i][0].pack(fill='x', side='top')
         ruleFrames[i].append(Label(ruleFrames[i][0], text=formatRule(rules[i])))
         ruleFrames[i][1].pack(fill='both', side='left')
-        print(i,rules[i])
         
 
     endingWord = Text(ruleScreen, height=2)
@@ -597,7 +610,6 @@ def formatRule(ruleArray):
         ruleStr += ' +'.join(ruleArray[4])+' '
         ruleStr+=ruleArray[5]
 
-    print(ruleStr)
     makeNewline = False
     toReturn = 'i'
     lastSpace=0
@@ -606,11 +618,9 @@ def formatRule(ruleArray):
             makeNewline = True
         if makeNewline and ruleStr[i] == ' ':
             toReturn+=ruleStr[lastSpace+1:i]+'\n'
-            print(ruleStr[lastSpace+1:i])
             lastSpace = i
             makeNewline = False
     toReturn+=ruleStr[lastSpace:len(ruleStr)]
-    print(ruleStr[lastSpace:len(ruleStr)])
     return toReturn
             
 menuBar = Menu(root)
