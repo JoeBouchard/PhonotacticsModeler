@@ -536,7 +536,7 @@ def applyRules():
     wordFeats = textToFeatures(word)
 
     for r in rules:
-        for i in range(0, len(wordFeats)):
+        for i in range(0, max(1, len(wordFeats)-1)):
             valid=True
             for f in r[0]:
                 valid = True
